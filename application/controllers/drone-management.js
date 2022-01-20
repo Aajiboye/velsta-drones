@@ -1,8 +1,9 @@
 // controller: Handles api requests and responses
 const response = require('../utils/responseAdapter'); // response decorator utility
 const logger = require('../utils/logger'); // logger
-
 const droneManagementService = require('../services/drone-service');
+const {enumTypesValidator, limitsValidator} = require('../utils/validators');
+const {DRONEMODELS} = require('../config')
 function getFuncName() {
   return getFuncName.caller.name;
 }
@@ -14,22 +15,29 @@ const registerDrone = async (req, res) => {
   try {
     logger.trace(`${correlationID}: <<<<<<-- Entered ${getFuncName()} controller -->>>>>>`);
     // build drone data
+    const {model, weightLimit, batteryCapacity} = req.body;
     const droneData = {
-
+      model,
+      weightLimit,
+      batteryCapacity,
     };
-    const responseData = await droneManagementService.registerDrone(droneData, correlationID);
+    await enumTypesValidator(model.toUpperCase(), Object.keys(DRONEMODELS), correlationID);
+    await limitsValidator([1, DRONEMODELS[model.toUpperCase()]], weightLimit, correlationID);
+    await limitsValidator([0,100], batteryCapacity, correlationID);
+
+    const responseData = await droneManagementService.register(droneData, correlationID);
 
     logger.trace(`${correlationID}: ${responseData.message}`);
 
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
-    const error = {};
-    let message = '';
-    err.data ? (error.data = err.data) : (error.data = {});
-    err.name ? (error.name = err.name) : (error.name = 'UnknownError');
-    err.message ? (message = err.message) : (message = 'Something Failed');
-    return res.json(response.error(error, message));
+      const message = err.message || 'Something Failed';
+      const error = {
+        data: err.data || {},
+        name: err.name || 'UnknownError',
+      };
+      return res.json(response.error(error, message));
   }
 };
 
@@ -39,22 +47,34 @@ const updateDroneProfile = async (req, res) => {
   try {
     logger.trace(`${correlationID}: <<<<<<-- Entered ${getFuncName()} controller -->>>>>>`);
     // build drone data
-    const droneData = {
-
-    };
-    const responseData = await droneManagementService.updateDroneProfile(droneData, correlationID);
+    const { model, weightLimit, batteryCapacity } = req.body;
+    const updateData = {};
+    if (model){
+      await enumTypesValidator(model.toUpperCase(), Object.keys(DRONEMODELS), correlationID);
+      updateData.model = model;
+    } 
+    if (weightLimit){
+      await limitsValidator([1,DRONEMODELS[model.toUpperCase()]], weightLimit, correlationID);
+      updateData.weightLimit = weightLimit;
+    } 
+    if (batteryCapacity){
+      await limitsValidator([0,100], batteryCapacity, correlationID);
+      updateData.batteryCapacity = batteryCapacity;
+    } 
+    const { droneid } = req.query;
+    const responseData = await droneManagementService.update(droneid, updateData, correlationID);
 
     logger.trace(`${correlationID}: ${responseData.message}`);
 
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
-    const error = {};
-    let message = '';
-    err.data ? (error.data = err.data) : (error.data = {});
-    err.name ? (error.name = err.name) : (error.name = 'UnknownError');
-    err.message ? (message = err.message) : (message = 'Something Failed');
-    return res.json(response.error(error, message));
+      const message = err.message || 'Something Failed';
+      const error = {
+        data: err.data || {},
+        name: err.name || 'UnknownError',
+      };
+      return res.json(response.error(error, message));
   }
 };
 
@@ -64,19 +84,19 @@ const getAllDrones = async (req, res) => {
   try {
     logger.trace(`${correlationID}: <<<<<<-- Entered ${getFuncName()} controller -->>>>>>`);
 
-    const responseData = await droneManagementService.getAllDrones(correlationID);
+    const responseData = await droneManagementService.allDrones(correlationID);
 
     logger.trace(`${correlationID}: ${responseData.message}`);
 
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
-    const error = {};
-    let message = '';
-    err.data ? (error.data = err.data) : (error.data = {});
-    err.name ? (error.name = err.name) : (error.name = 'UnknownError');
-    err.message ? (message = err.message) : (message = 'Something Failed');
-    return res.json(response.error(error, message));
+      const message = err.message || 'Something Failed';
+      const error = {
+        data: err.data || {},
+        name: err.name || 'UnknownError',
+      };
+      return res.json(response.error(error, message));
   }
 };
 
@@ -85,19 +105,19 @@ const getSingleDrones = async (req, res) => {
   const correlationID = req.header('x-correlation-id');
   try {
     logger.trace(`${correlationID}: <<<<<<-- Entered ${getFuncName()} controller -->>>>>>`);
-    const {droneID} = req.query;
-    const responseData = await droneManagementService.getSingleDrone(droneID, correlationID);
+    const {droneid} = req.query;
+    const responseData = await droneManagementService.getDrone(droneid, correlationID);
     logger.trace(`${correlationID}: ${responseData.message}`);
 
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
-    const error = {};
-    let message = '';
-    err.data ? (error.data = err.data) : (error.data = {});
-    err.name ? (error.name = err.name) : (error.name = 'UnknownError');
-    err.message ? (message = err.message) : (message = 'Something Failed');
-    return res.json(response.error(error, message));
+      const message = err.message || 'Something Failed';
+      const error = {
+        data: err.data || {},
+        name: err.name || 'UnknownError',
+      };
+      return res.json(response.error(error, message));
   }
 };
 
@@ -113,12 +133,12 @@ const changeDroneState = async (req, res) => {
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
-    const error = {};
-    let message = '';
-    err.data ? (error.data = err.data) : (error.data = {});
-    err.name ? (error.name = err.name) : (error.name = 'UnknownError');
-    err.message ? (message = err.message) : (message = 'Something Failed');
-    return res.json(response.error(error, message));
+      const message = err.message || 'Something Failed';
+      const error = {
+        data: err.data || {},
+        name: err.name || 'UnknownError',
+      };
+      return res.json(response.error(error, message));
   }
 };
 
@@ -127,19 +147,19 @@ const deleteDrone = async (req, res) => {
   const correlationID = req.header('x-correlation-id');
   try {
     logger.trace(`${correlationID}: <<<<<<-- Entered ${getFuncName()} controller -->>>>>>`);
-    const {droneID, deleteType} = req.query;
-    const responseData = await droneManagementService.deleteDrone(droneID, deleteType, correlationID);
+    const {droneid, deleteType} = req.query;
+    const responseData = await droneManagementService.deleteDrone(droneid, deleteType, correlationID);
     logger.trace(`${correlationID}: ${responseData.message}`);
 
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
-    const error = {};
-    let message = '';
-    err.data ? (error.data = err.data) : (error.data = {});
-    err.name ? (error.name = err.name) : (error.name = 'UnknownError');
-    err.message ? (message = err.message) : (message = 'Something Failed');
-    return res.json(response.error(error, message));
+      const message = err.message || 'Something Failed';
+      const error = {
+        data: err.data || {},
+        name: err.name || 'UnknownError',
+      };
+      return res.json(response.error(error, message));
   }
 };
 module.exports = {

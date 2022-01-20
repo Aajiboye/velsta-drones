@@ -5,4 +5,6 @@ module.exports = {
   SUCCESS: 'Request was successfull',
   GENERALERROR: 'An error occured please try again later',
   NODATA: 'No data in response',
+  NOREQUESTDATA: 'No data in request body',
+  MISSINGFIELD: 'Missing required field'
 };

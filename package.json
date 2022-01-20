@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --config ./jest.config.json",
     "start": "node application/server.js",
-    "dev": "nodemon application/server.js"
+    "dev": "nodemon application/server.js",
+    "lint": "eslint --ext .js,.jsx ."
   },
   "repository": {
     "type": "git",

@@ -1,16 +1,16 @@
 // Business logic comes in here
-const Drone = require('../models/Drone.model'); // import location model
+const Drone = require('../models/Drone.model'); // import drone model
 const logger = require('../utils/logger'); // logger
 function getFuncName() {
   return getFuncName.caller.name;
 }
 // data processing and exchange layer between server and db.
 const register = async (droneObj, correlationID) => {
-  const newLocation = new Drone(droneObj);
-  await newLocation.save();
-  logger.trace(`${correlationID}: <<<< Exiting locationManagementService.add()`);
+  const newdrone = new Drone(droneObj);
+  await newdrone.save();
+  logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
   const response = {};
-  response.data = newLocation;
+  response.data = newdrone;
   response.message = 'Drone added successfully';
   response.success = true;
   return response;
@@ -18,12 +18,12 @@ const register = async (droneObj, correlationID) => {
 
 const update = async (droneID, updateObj, correlationID) => {
   try {
-    const updateLocation = await Drone.findOneAndUpdate(
+    const updatedrone = await Drone.findOneAndUpdate(
       { _id: droneID }, updateObj, { new: true },
     );
     logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
     const response = {};
-    response.data = updateLocation;
+    response.data = updatedrone;
     response.message = 'Drone updated successfully';
     response.success = true;
     return response;
@@ -35,6 +35,7 @@ const update = async (droneID, updateObj, correlationID) => {
 // delete drone
 const deleteDrone = async (droneID, deleteType, correlationID) => {
   try {
+    let message = 'Drone deleted successfully'
     if (deleteType === 'HARD') {
       await Drone.findOneAndDelete(
       { _id: droneID }
@@ -43,12 +44,13 @@ const deleteDrone = async (droneID, deleteType, correlationID) => {
       await Drone.findOneAndUpdate(
         { _id: droneID },{deleted: true}
       );
+      message = 'Drone added to recycle bin'
     }
     
     logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
     const response = {};
     response.data = {};
-    response.message = 'Drone added to recycle bin';
+    response.message = message;
     response.success = true;
     return response;
   } catch (err) {
@@ -71,14 +73,14 @@ const allDrones = async (correlationID) => {
   }
 };
 
-// get single location
-const getDrone = async (locationID, correlationID) => {
+// get single drone
+const getDrone = async (droneid, correlationID) => {
   try {
-    const location = await Drone.findOne({ _id: locationID });
+    const drone = await Drone.findOne({ _id: droneid });
     logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
     const response = {};
-    response.data = location;
-    response.message = 'Location retrieved successfully';
+    response.data = drone || {};
+    response.message = 'Drone retrieved successfully';
     response.success = true;
     return response;
   } catch (err) {

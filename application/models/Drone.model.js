@@ -7,7 +7,8 @@ const {DRONEMODELS, DRONESTATES} = require('../config');
 const DroneSchema = mongoose.Schema({
   model: {
     type: String,
-    enum: DRONEMODELS,
+    enum: Object.keys(DRONEMODELS),
+    uppercase: true,
   },
   weightLimit: {
     type: Number,
@@ -37,7 +38,7 @@ DroneSchema.pre('save', function (next) {
     next();
     return;
   }
-  autoIncrementModelID('applicationCount', 'serialNo', this, next, 'DRN');
+  autoIncrementModelID('applicationCount', 'serialNo', this, next, 'drn');
 });
 DroneSchema.pre('find', function () {
   this.where({ deleted: false });
