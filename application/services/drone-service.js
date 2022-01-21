@@ -1,6 +1,7 @@
 // Business logic comes in here
 const Drone = require('../models/Drone.model'); // import drone model
 const logger = require('../utils/logger'); // logger
+const {DRONESTATES} = require('../config');
 function getFuncName() {
   return getFuncName.caller.name;
 }
@@ -62,11 +63,11 @@ const deleteDrone = async (droneID, deleteType, correlationID) => {
 const allDrones = async (filter, correlationID) => {
   try {
     let drones = await Drone.find();
-    if (filter) drones = await Drone.find({state: filter.toUpperCase()});
+    if (DRONESTATES.includes(filter)) drones = await Drone.find({state: filter.toUpperCase()});
     logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
     const response = {};
     response.data = drones;
-    response.message = `Drones ${filter.toLowerCase() || ''} retrieved successfully`;
+    response.message = `Drones ${filter?.toLowerCase() || ''} retrieved successfully`;
     response.success = true;
     return response;
   } catch (err) {
