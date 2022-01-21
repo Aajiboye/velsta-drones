@@ -59,13 +59,14 @@ const deleteDrone = async (droneID, deleteType, correlationID) => {
 };
 
 // get all drones
-const allDrones = async (correlationID) => {
+const allDrones = async (filter, correlationID) => {
   try {
-    const drones = await Drone.find();
+    let drones = await Drone.find();
+    if (filter) drones = await Drone.find({state: filter.toUpperCase()});
     logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
     const response = {};
     response.data = drones;
-    response.message = 'Drones retrieved successfully';
+    response.message = `Drones ${filter.toLowerCase() || ''} retrieved successfully`;
     response.success = true;
     return response;
   } catch (err) {
@@ -77,10 +78,13 @@ const allDrones = async (correlationID) => {
 const getDrone = async (droneid, correlationID) => {
   try {
     const drone = await Drone.findOne({ _id: droneid });
+    let message = 'Drone retrieved successfully'
+    if (drone.batteryCapacity <= 30) message = 'Drone running low on battery power please charge'
+
     logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
     const response = {};
     response.data = drone || {};
-    response.message = 'Drone retrieved successfully';
+    response.message = message;
     response.success = true;
     return response;
   } catch (err) {
@@ -89,10 +93,23 @@ const getDrone = async (droneid, correlationID) => {
 };
 
 
+// get available drones
+const getAvailableDrones = async (droneid, correlationID) => {
+  // get drone so to check if it can be loaded
+  const allIdleDrones = await Drone.find({state: 'IDLE'});
+  logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
+  const response = {};
+  response.data = allIdleDrones;
+  response.message = 'Available drones retrieved successfully';
+  response.success = true;
+  return response;
+};
+
 module.exports = {
   register,
   update,
   deleteDrone,
   allDrones,
   getDrone,
+  getAvailableDrones,
 }

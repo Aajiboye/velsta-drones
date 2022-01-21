@@ -83,11 +83,11 @@ const getAllDrones = async (req, res) => {
   const correlationID = req.header('x-correlation-id');
   try {
     logger.trace(`${correlationID}: <<<<<<-- Entered ${getFuncName()} controller -->>>>>>`);
+    const filter = req.query.filter;
 
-    const responseData = await droneManagementService.allDrones(correlationID);
+    const responseData = await droneManagementService.allDrones(filter, correlationID);
 
     logger.trace(`${correlationID}: ${responseData.message}`);
-
     return res.json(response.success(responseData.data, responseData.message));
   } catch (err) {
     logger.debug(`${correlationID}: ${err}`);
