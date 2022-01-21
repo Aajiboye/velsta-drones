@@ -68,12 +68,18 @@ Find below a link to the published postman documentation for this API
 https://documenter.getpostman.com/view/8640133/UVXomu9K
 
 # routes
-register drone - To register a new drone to the fleet
-update drone - drone information can be updated
-all drones - this fetches all the drones in the system. Note that this endpoint contains a query param called filter where drone can be filtered by state 'IDLE', 'LOADED'... If no query param is specified all drones are returned
-Get single drone - A single drone can be gotten by id. Note that this endpoint suffices to get drone information including battery information.
-Delete drone - This performs delete action on drone. Endpoint can be modified by passing a deletType param to the url to state hard or soft delete. Hard delete is a parmanent delete while soft delete only moves the data to recycle bin
+ - register drone - To register a new drone to the fleet
+
+ - update drone - drone information can be updated
+
+ - all drones - this fetches all the drones in the system. Note that this endpoint contains a query param called filter where drone can be filtered by state 'IDLE', 'LOADED'... If no query param is specified all drones are returned
+
+ - Get single drone - A single drone can be gotten by id. Note that this endpoint suffices to get drone information including battery information.
+
+ - Delete drone - This performs delete action on drone. Endpoint can be modified by passing a deletType param to the url to state hard or soft delete. Hard delete is a parmanent delete while soft delete only moves the data to recycle bin
+
 - load drone - this endpoint handles the functionality of loading dron with medical items.
+
 - get drone items - this endpoint retrieves all the medical items loaded in a particular drone.
 
 # Battery audit functionality
