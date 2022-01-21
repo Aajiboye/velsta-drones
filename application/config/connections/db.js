@@ -5,7 +5,7 @@ const config = require('../index');
 const db = config.MONGODB_URI;
 const logger = require('../../utils/logger');
 
-const connectDB = async () => {
+const connectDB = async (callback) => {
   try {
     await mongoose
       .connect(db, {
@@ -15,6 +15,7 @@ const connectDB = async () => {
 
     logger.trace('MongoDB Connected....');
     console.log('MongoDB Connected...');
+    callback();
   } catch (err) {
     logger.debug(`MongoDB connection failed due to: ${err.message}`);
     console.error(err.message);

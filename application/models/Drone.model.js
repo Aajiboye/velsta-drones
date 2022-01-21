@@ -45,4 +45,4 @@ DroneSchema.pre('find', function () {
   this.sort({ createdAt: -1 });
 });
 
-module.exports = mongoose.model('location', DroneSchema);
+module.exports = mongoose.model('drone', DroneSchema);

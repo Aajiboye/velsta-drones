@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const connectDB = require('./config/connections/db');
 const config = require('./config/index');
 const droneRoute = require('./routes/drone.route');
+const dispatchRoute = require('./routes/dispatch.route');
+const { job } = require('./services/jobs');
 
 const logger = require('./utils/logger');
 const correlationIDMidware = require('./middleware/correlation-id-middleware');
@@ -36,10 +38,13 @@ app.get('/healthcheck', (req, res) => {
   res.send('Server is Up');
 });
 app.use('/v1/drone', droneRoute);
+app.use('/v1/dispatch', dispatchRoute);
 
 // app.use('/cend/api/v1/admin', user);
 app.listen(config.PORT, () => {
   // Connect Database
-  connectDB();
+  connectDB(()=>{
+    job();
+  });
   console.log(`Server is up and running on port number ${config.PORT}`);
 });
