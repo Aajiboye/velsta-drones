@@ -8,7 +8,6 @@ const logger = require('../utils/logger');
 const runRoutine = async () => {
   try {
     const allDrones = await Drone.find({});
-    console.log(allDrones)
     allDrones.forEach(async (drone) => {
       const droneObj = {
         drone: drone._id,
@@ -17,7 +16,6 @@ const runRoutine = async () => {
       if (drone.batteryCapacity < 25) droneObj.batteryStatus = 'LOW';
       const newAuditObj = new DroneBatteryAudit(droneObj);
       await newAuditObj.save()
-      console.log(newAuditObj)
     });
   } catch (err) {
     logger.error(`<<<< Job failed due tols ${err}`);
