@@ -1,0 +1,35 @@
+{
+  "name": "velsta-drones",
+  "version": "1.0.0",
+  "description": "RestAPI to manage drones and medical items delivery",
+  "main": "application/server.js",
+  "scripts": {
+    "test": "jest --config ./jest.config.json",
+    "start": "node application/server.js",
+    "dev": "nodemon application/server.js",
+    "lint": "eslint --ext .js,.jsx ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aajiboye/velsta-drones.git"
+  },
+  "author": "Ajiboye Abraham",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aajiboye/velsta-drones/issues"
+  },
+  "homepage": "https://github.com/Aajiboye/velsta-drones#readme",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "log4js": "^6.4.0",
+    "mongoose": "^6.1.7"
+  },
+  "devDependencies": {
+    "eslint": "~7.14.0",
+    "eslint-config-airbnb": "~18.2.1",
+    "eslint-plugin-import": "~2.22.1"
+  }
+}
