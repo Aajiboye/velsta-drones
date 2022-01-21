@@ -12,7 +12,7 @@ const load = async (droneid, medicationItems, correlationID) => {
   // get drone so to check if it can be loaded
   const getDrone = await Drone.findOne({_id: droneid});
   // check battery level
-  if (getDrone.status !== 'IDLE') throw new Error('Drone currently in use, please try again');
+  if (getDrone.state !== 'IDLE') throw new Error('Drone currently in use, please try again');
   if (getDrone.batteryLevel < 25) throw new Error('Cannot load this drone due to low battery. Please charge or replace battery');
   // get the weight of items and throw error if net weight is higher than drone max weight
   const itemsWeight = medicationItems.reduce((total, item) => total + item.weight, 0);
@@ -23,7 +23,7 @@ const load = async (droneid, medicationItems, correlationID) => {
   createDispatch.drone = droneid;
   await createDispatch.save();
   // set drone status to loaded
-  getDrone.status = 'LOADED';
+  getDrone.state = 'LOADED';
   getDrone.save();
   logger.trace(`${correlationID}: <<<< Exiting ${getFuncName()} Service`);
   const response = {};
